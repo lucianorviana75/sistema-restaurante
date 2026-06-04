@@ -1,0 +1,69 @@
+===== ✅ SISTEMA RESTAURANTE - TAREFAS =====
+
+[✔] Backend básico (FastAPI)
+[✔] CRUD de itens (criar, listar, excluir)
+[✔] Sistema de pedidos
+[✔] Interface cliente (Flet)
+[✔] Interface cozinha
+[✔] Interface admin
+[✔] Salvar dados em JSON
+[✔] Subir no GitHub
+[✔] Criar README básico
+
+
+===== 🔄 MELHORIAS IMPORTANTES =====
+
+[ ] Auto atualizar pedidos (sem botão)
+[ ] Auto atualizar menu no cliente
+[ ] Melhorar layout do cliente
+[ ] Mostrar categorias no cliente
+[ ] Organizar itens por categoria
+[ ] Melhorar layout do admin
+[ ] Botão de confirmação antes de excluir
+[ ] Adicionar edição de item (nome/preço)
+[ ] Usar dropdown para categorias
+
+
+===== 🍽️ COZINHA PROFISSIONAL =====
+
+[ ] Separar pedidos por status (colunas)
+[ ] Status: pendente / preparando / pronto
+[ ] Cores diferentes por status
+[ ] Atualização automática da cozinha
+[ ] Destacar pedido novo
+
+
+===== 🎨 UX / UI =====
+
+[ ] Melhorar visual geral (cards mais bonitos)
+[ ] Botões mais claros (visual moderno)
+[ ] Melhor organização do layout
+[ ] Interface responsiva (melhor adaptação)
+[ ] Mostrar total do carrinho no cliente
+
+
+===== 💾 DADOS E SISTEMA =====
+
+[ ] Validar dados (evitar nome/preço vazio)
+[ ] Melhorar estrutura do JSON
+[ ] Criar backup automático
+[ ] Preparar para banco de dados (futuro)
+
+
+===== 🚀 FUTURO / AVANÇADO =====
+
+[ ] Login de admin
+[ ] Multiplos usuários
+[ ] Sistema de pagamento
+[ ] App mobile
+[ ] Deploy online (colocar na internet)
+[ ] Usar banco de dados real (SQLite ou PostgreSQL)
+[ ] API segura (JWT)
+
+
+===== 🧠 EXTRA =====
+
+[ ] Melhorar documentação (README completo)
+[ ] Adicionar imagens no GitHub
+[ ] Criar versão em inglês
+[ ] Separar backend e frontend melhor
