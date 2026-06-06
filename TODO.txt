@@ -16,8 +16,8 @@
 [ ] Auto atualizar pedidos (sem botão)
 [ ] Auto atualizar menu no cliente
 [ ] Melhorar layout do cliente
-[ ] Mostrar categorias no cliente
-[ ] Organizar itens por categoria
+[✔]  Mostrar categorias no cliente
+[✔ ] Organizar itens por categoria
 [ ] Melhorar layout do admin
 [ ] Botão de confirmação antes de excluir
 [ ] Adicionar edição de item (nome/preço)
