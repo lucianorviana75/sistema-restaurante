@@ -1,12 +1,24 @@
 from fastapi import FastAPI
-import time
 from datetime import datetime
 import json
 import os
+from pydantic import BaseModel
+import time
 
 app = FastAPI()
 
 ARQUIVO = "dados.json"
+
+
+# ✅ MODELOS (IMPORTANTE)
+class Categoria(BaseModel):
+    nome: str
+
+
+class Item(BaseModel):
+    nome: str
+    preco: float
+    categoriaId: str
 
 
 # ✅ Carregar dados
@@ -14,26 +26,27 @@ def carregar_dados():
     if not os.path.exists(ARQUIVO):
         return {"categorias": [], "itens": [], "pedidos": []}
 
-    with open(ARQUIVO, "r") as f:
+    with open(ARQUIVO, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 # ✅ Salvar dados
 def salvar_dados():
-    with open(ARQUIVO, "w") as f:
+    with open(ARQUIVO, "w", encoding="utf-8") as f:
         json.dump({
             "categorias": categorias,
             "itens": itens,
             "pedidos": pedidos
-        }, f, indent=4)
+        }, f, indent=4, ensure_ascii=False)
+
+    print("✅ Dados salvos!")
 
 
 # ✅ carregar ao iniciar
 dados = carregar_dados()
-
-categorias = dados["categorias"]
-itens = dados["itens"]
-pedidos = dados["pedidos"]
+categorias = dados.get("categorias", [])
+itens = dados.get("itens", [])
+pedidos = dados.get("pedidos", [])
 
 
 @app.get("/")
@@ -44,16 +57,18 @@ def home():
 # =========================
 # ✅ CATEGORIAS
 # =========================
+
 @app.post("/categorias")
-def criar_categoria(body: dict):
+def criar_categoria(body: Categoria):
     categoria = {
         "id": str(time.time()),
-        "nome": body.get("nome"),
+        "nome": body.nome,
         "ativo": True
     }
 
     categorias.append(categoria)
     salvar_dados()
+
     return categoria
 
 
@@ -65,17 +80,19 @@ def listar_categorias():
 # =========================
 # ✅ ITENS
 # =========================
+
 @app.post("/itens")
-def criar_item(body: dict):
+def criar_item(body: Item):
     item = {
         "id": str(time.time()),
-        "nome": body.get("nome"),
-        "preco": body.get("preco"),
-        "categoriaId": body.get("categoriaId")
+        "nome": body.nome,
+        "preco": body.preco,
+        "categoriaId": body.categoriaId
     }
 
     itens.append(item)
     salvar_dados()
+
     return item
 
 
@@ -87,9 +104,10 @@ def listar_itens():
 @app.delete("/itens/{id}")
 def deletar_item(id: str):
     global itens
-    itens = [item for item in itens if item["id"] != id]
 
+    itens = [item for item in itens if item["id"] != id]
     salvar_dados()
+
     return {"msg": "Item removido"}
 
 
@@ -99,14 +117,15 @@ def deletar_item(id: str):
 
 @app.post("/pedidos")
 def criar_pedido(body: dict):
-
     lista_itens = body.get("itens", [])
 
     itens_pedido = []
     total = 0
 
     for item in lista_itens:
-        item_encontrado = next((i for i in itens if i["id"] == item["itemId"]), None)
+        item_encontrado = next(
+            (i for i in itens if i["id"] == item["itemId"]), None
+        )
 
         if item_encontrado:
             subtotal = item_encontrado["preco"] * item["quantidade"]
@@ -126,7 +145,7 @@ def criar_pedido(body: dict):
         "itens": itens_pedido,
         "total": total,
         "status": "pendente",
-        "data": str(datetime.now())
+        "data": datetime.now().isoformat()
     }
 
     pedidos.append(pedido)
@@ -149,3 +168,51 @@ def atualizar_pedido(id: str, body: dict):
             return p
 
     return {"erro": "pedido não encontrado"}
+
+
+@app.delete("/pedidos/{id}")
+def deletar_pedido(id: str):
+    global pedidos
+
+    pedidos = [p for p in pedidos if p["id"] != id]
+    salvar_dados()
+
+    return {"msg": "Pedido removido"}
+
+
+# =========================
+# ✅ PDF
+# =========================
+from reportlab.pdfgen import canvas
+
+
+@app.get("/pedidos/pdf/{data}")
+def gerar_pdf(data: str):
+    nome_arquivo = f"pedidos_{data}.pdf"
+    c = canvas.Canvas(nome_arquivo)
+
+    y = 800
+
+    for p in pedidos:
+        if data in p["data"]:
+
+            if y < 50:
+                c.showPage()
+                y = 800
+
+            c.drawString(50, y, f"Pedido {p['id']} - Total R$ {p['total']}")
+            y -= 20
+
+            for item in p["itens"]:
+                c.drawString(
+                    70, y,
+                    f"{item['nome']} x{item['quantidade']}"
+                )
+                y -= 20
+
+            y -= 10
+
+    c.save()
+
+    return {"msg": f"PDF gerado: {nome_arquivo}"}
+import time

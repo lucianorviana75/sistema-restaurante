@@ -1,14 +1,15 @@
 import flet as ft
 import requests
+from datetime import datetime
 
 API_URL = "http://127.0.0.1:8000"
 
 
 def main(page: ft.Page):
     page.title = "Painel de Pedidos"
-    page.scroll = "auto"
 
-    lista_pedidos = ft.Column()
+    # ✅ lista com rolagem garantida
+    lista_pedidos = ft.ListView(expand=True, spacing=10)
 
     # 🎨 cores por status
     def cor_status(status):
@@ -21,25 +22,36 @@ def main(page: ft.Page):
         else:
             return "white"
 
+    # ✅ deletar pedido
+    def deletar(pedido_id):
+        requests.delete(f"{API_URL}/pedidos/{pedido_id}")
+        carregar_pedidos()
+
     # 🔄 atualizar pedidos
     def carregar_pedidos(e=None):
         lista_pedidos.controls.clear()
 
-        response = requests.get(f"{API_URL}/pedidos")
-        pedidos = response.json()
+        try:
+            pedidos = requests.get(f"{API_URL}/pedidos").json()
+        except:
+            pedidos = []
 
         for pedido in pedidos:
-            itens_lista = []
 
-            for item in pedido["itens"]:
-                itens_lista.append(
-                    ft.Text(f"{item['nome']} x{item['quantidade']}")
-                )
+            itens_lista = [
+                ft.Text(f"{i['nome']} x{i['quantidade']}")
+                for i in pedido["itens"]
+            ]
 
-            # botões de status
-            def mudar_status(pedido_id, status):
+            # ✅ data segura
+            try:
+                data = datetime.fromisoformat(pedido["data"]).strftime("%d/%m %H:%M")
+            except:
+                data = "sem data"
+
+            def mudar_status(id, status):
                 requests.put(
-                    f"{API_URL}/pedidos/{pedido_id}",
+                    f"{API_URL}/pedidos/{id}",
                     json={"status": status}
                 )
                 carregar_pedidos()
@@ -48,6 +60,7 @@ def main(page: ft.Page):
                 content=ft.Container(
                     content=ft.Column([
                         ft.Text(f"Pedido #{pedido['id']}", weight="bold"),
+                        ft.Text(f"🕒 {data}", size=12),
                         ft.Text(f"Status: {pedido['status']}"),
                         ft.Text(f"Total: R$ {pedido['total']}"),
 
@@ -66,9 +79,15 @@ def main(page: ft.Page):
                                 "Entregue",
                                 on_click=lambda e, id=pedido["id"]: mudar_status(id, "entregue")
                             ),
+                            ft.ElevatedButton(
+                                "Excluir",
+                                bgcolor="red",
+                                color="white",
+                                on_click=lambda e, id=pedido["id"]: deletar(id)
+                            ),
                         ])
                     ]),
-                    padding=15,
+                    padding=10,
                     bgcolor=cor_status(pedido["status"]),
                     border_radius=10
                 )
@@ -78,13 +97,13 @@ def main(page: ft.Page):
 
         page.update()
 
-    # botão atualizar
-    atualizar_btn = ft.ElevatedButton("Atualizar", on_click=carregar_pedidos)
-
+    # ✅ layout correto
     page.add(
-        ft.Text("📋 Painel de Pedidos", size=30, weight="bold"),
-        atualizar_btn,
-        lista_pedidos
+        ft.Column([
+            ft.Text("📋 Painel de Pedidos", size=30),
+            ft.ElevatedButton("Atualizar", on_click=carregar_pedidos),
+            lista_pedidos
+        ], expand=True)
     )
 
     carregar_pedidos()

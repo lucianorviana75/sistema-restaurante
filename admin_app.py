@@ -9,9 +9,27 @@ def main(page: ft.Page):
 
     nome = ft.TextField(label="Nome do item")
     preco = ft.TextField(label="Preço")
-    categoria = ft.TextField(label="Categoria")
+
+    # ✅ dropdown de categorias (melhor que TextField)
+    dropdown_categoria = ft.Dropdown(label="Categoria")
 
     lista = ft.Column()
+
+    # ✅ carregar categorias no dropdown
+    def carregar_categorias():
+        dropdown_categoria.options.clear()
+
+        try:
+            categorias = requests.get(f"{API_URL}/categorias").json()
+        except:
+            categorias = []
+
+        for cat in categorias:
+            dropdown_categoria.options.append(
+                ft.dropdown.Option(cat["id"], cat["nome"])
+            )
+
+        page.update()
 
     # ✅ carregar itens
     def carregar(e=None):
@@ -24,14 +42,10 @@ def main(page: ft.Page):
 
         for item in itens:
 
-            # ✅ pega o id corretamente (IMPORTANTE)
             item_id = item["id"]
 
             def excluir(e, id=item_id):
-                try:
-                    requests.delete(f"{API_URL}/itens/{id}")
-                except:
-                    print("Erro ao deletar")
+                requests.delete(f"{API_URL}/itens/{id}")
                 carregar()
 
             linha = ft.Row([
@@ -45,22 +59,19 @@ def main(page: ft.Page):
 
     # ✅ salvar item
     def salvar(e):
-        if not nome.value or not preco.value:
+        if not nome.value or not preco.value or not dropdown_categoria.value:
             print("Preencha os campos")
             return
 
-        try:
-            requests.post(f"{API_URL}/itens", json={
-                "nome": nome.value,
-                "preco": float(preco.value),
-                "categoriaId": categoria.value
-            })
-        except:
-            print("Erro ao salvar")
+        requests.post(f"{API_URL}/itens", json={
+            "nome": nome.value,
+            "preco": float(preco.value),
+            "categoriaId": dropdown_categoria.value
+        })
 
         nome.value = ""
         preco.value = ""
-        categoria.value = ""
+        dropdown_categoria.value = None
 
         carregar()
 
@@ -70,7 +81,7 @@ def main(page: ft.Page):
 
         nome,
         preco,
-        categoria,
+        dropdown_categoria,  # ✅ aqui entra categoria
 
         ft.ElevatedButton("Adicionar Item", on_click=salvar),
 
@@ -83,6 +94,7 @@ def main(page: ft.Page):
         lista
     )
 
+    carregar_categorias()
     carregar()
 
 
