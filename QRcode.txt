@@ -1,0 +1,126 @@
+PASSO A PASSO – CRIAR QR CODE PARA O CARDÁPIO
+
+--------------------------------------------------
+
+1. OBJETIVO
+
+Criar um QR Code para que o cliente escaneie com o celular e abra o cardápio do sistema.
+
+--------------------------------------------------
+
+2. PREPARAÇÃO DO SISTEMA
+
+Antes de gerar o QR Code, é necessário rodar o sistema.
+
+PASSO 1 – Rodar o backend (API)
+Comando:
+python -m uvicorn main:app --host 0.0.0.0 --port 8000
+
+PASSO 2 – Rodar o cliente (cardápio)
+Comando:
+flet run cliente_app.py --web --host 0.0.0.0 --port 8550
+
+--------------------------------------------------
+
+3. OBTER O LINK DO CARDÁPIO
+
+Descobrir o IP da máquina:
+
+No terminal digite:
+ipconfig
+
+Procure:
+Endereço IPv4
+
+Exemplo:
+192.168.0.31
+
+Link final do cardápio:
+http://192.168.0.31:8550
+
+--------------------------------------------------
+
+4. INSTALAR BIBLIOTECA DE QR CODE
+
+No terminal digite:
+
+pip install qrcode[pil]
+
+--------------------------------------------------
+
+5. CRIAR ARQUIVO PARA GERAR QR
+
+Criar arquivo:
+gerar_qr.py
+
+Código:
+
+import qrcode
+
+link = "http://192.168.0.31:8550"
+
+qr = qrcode.make(link)
+
+qr.save("menu_qr.png")
+
+print("QR Code gerado com sucesso!")
+
+--------------------------------------------------
+
+6. GERAR O QR CODE
+
+No terminal:
+
+python gerar_qr.py
+
+--------------------------------------------------
+
+7. RESULTADO
+
+Será criado o arquivo:
+
+menu_qr.png
+
+--------------------------------------------------
+
+8. TESTAR O QR CODE
+
+No celular:
+1. Conectar no mesmo Wi-Fi
+2. Abrir a câmera
+3. Escanear o QR
+
+Resultado esperado:
+Abrir o cardápio do restaurante
+
+--------------------------------------------------
+
+9. PROBLEMAS COMUNS E SOLUÇÕES
+
+PROBLEMA: Não abre no celular
+SOLUÇÃO:
+- Verificar se está no mesmo Wi-Fi
+- Verificar IP correto
+
+PROBLEMA: Usar 127.0.0.1
+ERRO:
+http://127.0.0.1:8550
+
+CORRETO:
+http://192.168.X.X:8550
+
+PROBLEMA: Usar 0.0.0.0
+ERRO:
+http://0.0.0.0:8550
+
+--------------------------------------------------
+
+10. RESULTADO FINAL
+
+- Cliente escaneia QR Code
+- Abre o cardápio no celular
+- Sistema funciona sem precisar instalar app
+
+--------------------------------------------------
+
+FIM
