@@ -1,0 +1,60 @@
+DOCUMENTAÇÃO - PROJETO MENU RESTAURANTE
+
+1. DESCRIÇÃO
+Sistema completo de restaurante com:
+- Backend (FastAPI)
+- Frontend (Flet)
+- QR Code para acesso no celular
+
+2. QR CODE (PASSO A PASSO)
+1. Instalar biblioteca:
+   pip install qrcode[pil]
+
+2. Criar arquivo gerar_qr.py:
+
+   import qrcode
+
+   link = "http://192.168.0.31:8550"
+
+   qr = qrcode.make(link)
+   qr.save("menu_qr.png")
+
+3. Rodar:
+   python gerar_qr.py
+
+3. BACKEND (FASTAPI)
+- Rodar com:
+  python -m uvicorn main:app --host 0.0.0.0 --port 8000
+
+- Rotas principais:
+  /categorias
+  /itens
+  /pedidos
+
+4. FRONTEND (FLET)
+- Cliente:
+  python cliente_app.py
+
+- Admin:
+  python admin_app.py
+
+- Painel:
+  python pedidos_app.py
+
+5. PROBLEMAS ENCONTRADOS
+- Scroll não funcionava
+- Categorias não apareciam
+- Erro 422 no FastAPI
+- dados.json não salvava
+
+6. SOLUÇÕES
+- Uso de ListView
+- Uso de BaseModel
+- Correção salvar_dados
+- Reset do dados.json
+
+7. RESULTADO
+- Sistema funcionando completo
+- QR Code funcional
+- Uso no celular
+
